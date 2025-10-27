@@ -45,6 +45,9 @@ class GreenAPITester:
         except requests.exceptions.RequestException as e:
             print(f"❌ Request failed: {e}")
             return False, str(e)
+        except Exception as e: # Catch broader exceptions
+            print(f"❌ Unexpected error in send_message: {e}")
+            return False, str(e)
 
     def send_poll(self, phone_number, message, options, multiple_answers=False):
         """Send a poll to a phone number"""
@@ -93,6 +96,11 @@ class GreenAPITester:
 # Usage
 if __name__ == "__main__":
     
+    # --- !! CRITICAL DELAY !! ---
+    # This is the wait time between sending the *entire* survey to the next person.
+    # 30 seconds is a bare minimum. Increase this if you get banned.
+    DELAY_BETWEEN_USERS = 30
+
     # Initialize tester
     api_tester = GreenAPITester(ID_INSTANCE, API_TOKEN_INSTANCE)
     
@@ -108,7 +116,7 @@ Hanya 5 minit diperlukan — namun suara anda mampu membawa perubahan.
 
 👉 Sertai tinjauan ini dan suarakan pendapat anda.
 
---------------------------------------------------------------------
+----------------------------------------------------------------
 
 Life in KL isn’t always easy — from rising costs to daily struggles, every voice has a story. This short survey lets you share what truly matters to you and your community.
 
@@ -117,6 +125,17 @@ Your views will help shape a fairer, more liveable Kuala Lumpur for all.
 It only takes 5 minutes — but your voice can make a real difference.
 
 👉 Take the survey and be heard."""
+
+# --- !! NEW FINAL MESSAGE !! ---
+    final_message = """Sila balas "Done" selepas anda selesai menjawab tinjauan.
+
+Terima kasih.
+
+----------------------------------------------------------------
+
+Please reply "Done" after you finished answering the survey.
+
+Thank you."""
 
     # Define list of polls
     polls = [
@@ -134,10 +153,10 @@ It only takes 5 minutes — but your voice can make a real difference.
         {
             "message": "2. Antara pilihan berikut, yang manakah paling mewakili pilihan anda? // Which of the following options best represents your preference?",
             "options": [
-                {"optionName": "Kerajaan Persekutuan melantik Datuk Bandar KL dan Majlis Penasihat // Federal Government appoints KL Mayor and Advisory Council"},
-                {"optionName": "Kerajaan Persekutuan melantik Datuk Bandar KL, tetapi pengundi KL memilih Majlis Tempatan // Federal Government appoints KL Mayor, but KL Voters elect Local Council"},
-                {"optionName": "Pengundi KL memilih Datuk Bandar KL, tetapi Kerajaan melantik Majlis Penasihat // KL Voters elect KL Mayor, but Government appoints Advisory Council"},
-                {"optionName": "Pengundi KL memilih Datuk Bandar KL dan Majlis Tempatan // KL Voters elect KL Mayor and Local Council"}
+                {"optionName": "Datuk Bandar & Majlis dilantik oleh Kerajaan Persekutuan // Mayor & Council appointed by Fed. Govt"},
+                {"optionName": "Kerajaan pilih Datuk Bandar, Pengundi KL pilih Majlis//Govt appoints Mayor, KL Voters elect Council"},
+                {"optionName": "Pengundi KL pilih Datuk Bandar, Kerajaan pilih Majlis // KL Voters elect Mayor, Govt elect Council"},
+                {"optionName": "Pengundi KL pilih Datuk Bandar & Majlis // KL Voters elect Mayor & Council"}
             ],
             "multiple_answers": False
         },
@@ -153,11 +172,11 @@ It only takes 5 minutes — but your voice can make a real difference.
         {
             "message": "4. Apakah sebab utama anda berasa positif terhadap beberapa parti politik Malaysia yang sedia ada? // What is the main reason you feel positive about some of the current Malaysian political parties?",
             "options": [
-                {"optionName": "Ada yang menunjukkan keupayaan baik dalam mengurus isu 3R // Some have shown good ability to manage 3R issues"},
-                {"optionName": "Ada yang menunjukkan keupayaan baik dalam mengurus rasuah // Some have shown good ability to manage corruption"},
-                {"optionName": "Ada yang menunjukkan keupayaan baik dalam mengurus isu ekonomi // Some have shown good ability to manage economic issues"},
-                {"optionName": "Ada yang menunjukkan konsistensi dalam isu-isu utama // Some have shown consistency on key issues"},
-                {"optionName": "Ada yang mampu menawarkan kumpulan pemimpin generasi baharu yang meyakinkan // Some can offer a convincing group of next-generation leaders"},
+                {"optionName": "Tunjuk keupayaan baik urus isu 3R // Showed good ability managing 3R issues"},
+                {"optionName": "Tunjuk keupayaan baik urus rasuah // Showed good ability managing corruption"},
+                {"optionName": "Tunjuk keupayaan baik urus isu ekonomi // Showed good ability managing economy issues"},
+                {"optionName": "Tunjuk konsisten pada isu utama // Showed consistency on key issues"},
+                {"optionName": "Ada yg tawar pemimpin gen baru yg meyakinkan // Offer convincing new-gen leaders"},
                 {"optionName": "Lain-lain // Other"}
             ],
             "multiple_answers": False
@@ -165,11 +184,11 @@ It only takes 5 minutes — but your voice can make a real difference.
         {
             "message": "5. Apakah sebab utama anda tidak berasa positif terhadap mana-mana parti politik Malaysia yang sedia ada? // What is the main reason you don’t feel positive about any of the current Malaysian political parties?",
             "options": [
-                {"optionName": "Tiada yang menunjukkan keupayaan baik dalam mengurus isu 3R // None have shown good ability to manage 3R issues"},
-                {"optionName": "Tiada yang menunjukkan keupayaan baik dalam mengurus rasuah // None have shown good ability to manage corruption"},
-                {"optionName": "Tiada yang menunjukkan keupayaan baik dalam mengurus isu ekonomi // None have shown good ability to manage economic issues"},
-                {"optionName": "Tiada yang menunjukkan konsistensi dalam isu-isu utama // None have shown consistency on key issues"},
-                {"optionName": "Tiada yang mampu menawarkan kumpulan pemimpin generasi baharu yang meyakinkan // None can offer a convincing group of next-generation leaders"},
+                {"optionName": "Tak tunjuk keupayaan baik urus isu 3R // No good ability shown managing 3R issues"},
+                {"optionName": "Tak tunjuk keupayaan baik urus rasuah // No good ability shown managing corruption"},
+                {"optionName": "Tak tunjuk keupayaan baik urus isu ekonomi // No good ability shown managing economy issues"},
+                {"optionName": "Tak tunjuk konsisten isu utama // No consistency shown on key issues"},
+                {"optionName": "Tiada yg tawar pemimpin gen baru yg meyakinkan // No convincing new-gen leaders offered"},
                 {"optionName": "Lain-lain // Other"}
             ],
             "multiple_answers": False
@@ -224,43 +243,75 @@ It only takes 5 minutes — but your voice can make a real difference.
         }
     ]
 
-    # Test sending polls
-    phone_number = "123456789"  # Replace with actual number
-    success = True
-
-    # 1. Send the introduction message first
-    print("--- Sending Introduction Message ---")
-    intro_success, result = api_tester.send_message(phone_number, message)
+    # --- Read phone numbers from file ---
+    try:
+        with open("phone_numbers.txt", "r") as f:
+            phone_numbers = [line.strip() for line in f if line.strip()]
+        print(f"✅ Found {len(phone_numbers)} numbers to message.")
+    except FileNotFoundError:
+        print("❌ ERROR: phone_numbers.txt not found! Please create it.")
+        exit() # Stop the script
     
-    if not intro_success:
-        print("💥 Failed to send intro message. Aborting.")
-        success = False
-    else:
-        # Wait 5 seconds for the user to read the intro
-        print("--- Waiting 5 seconds before starting poll... ---")
-        time.sleep(5)
-    # --- END OF FIX ---
+    print(f"--- Broadcast will start in 5 seconds. Press Ctrl+C to cancel. ---")
+    time.sleep(5)
 
-    # 2. Send each poll (only if intro was successful)
-    if success:
-        for i, poll in enumerate(polls):
-            print(f"--- Sending Poll {i+1}/{len(polls)} ---")
-            poll_success, result = api_tester.send_poll(
-                phone_number=phone_number,
-                message=poll["message"],
-                options=poll["options"],
-                multiple_answers=poll["multiple_answers"]
-            )
-            
-            if not poll_success:
-                success = False  # If one poll fails, mark the whole run as failed
-            
-            # Add a delay between polls to prevent spam filtering
-            if i < len(polls) - 1:  # Don't wait after the last poll
-                print("--- Waiting 10 seconds before next poll... ---")
-                time.sleep(2)
-    
-    if success:
-        print("🎉 All messages and polls sent successfully!")
-    else:
-        print("💥 Test failed! At least one message or poll could not be sent.")
+    # --- Main loop to iterate over each phone number ---
+    for i, phone_number in enumerate(phone_numbers):
+        print("\n" + "="*50)
+        print(f"Processing {i+1}/{len(phone_numbers)}: {phone_number}")
+        print("="*50)
+        
+        # Reset success flag for this user
+        success_for_this_user = True
+
+        # 1. Send the introduction message first
+        print("--- Sending Introduction Message ---")
+        intro_success, result = api_tester.send_message(phone_number, message)
+        
+        if not intro_success:
+            print(f"💥 Failed to send intro message to {phone_number}. Skipping this user.")
+            success_for_this_user = False # Mark as failed
+        else:
+            # Wait 5 seconds for the user to read the intro
+            print("--- Waiting 5 seconds before starting poll... ---")
+            time.sleep(5)
+        
+        # 2. Send each poll (only if intro was successful)
+        if success_for_this_user:
+            for j, poll in enumerate(polls):
+                print(f"--- Sending Poll {j+1}/{len(polls)} ---")
+                poll_success, result = api_tester.send_poll( # Changed variable name
+                    phone_number=phone_number,
+                    message=poll["message"],
+                    options=poll["options"],
+                    multiple_answers=poll["multiple_answers"]
+                )
+
+                if not poll_success:
+                    print(f"💥 Failed to send poll {j+1} to {phone_number}. Aborting polls for this user.")
+                    success_for_this_user = False # Mark as failed
+                    break # Stop sending more polls to this user
+
+                if j < len(polls) - 1: # Don't wait after the last poll
+                    print("--- Waiting 2 seconds before next poll... ---")
+                    time.sleep(15) # Short delay between polls
+
+        # --- !! SEND FINAL MESSAGE !! ---
+        # 3. Send the final "Done" message if all polls were sent
+        if success_for_this_user:
+            print("--- Sending Final Message ---")
+            time.sleep(2) # Short delay after last poll
+            final_success, result = api_tester.send_message(phone_number, final_message) # Changed variable name
+            if final_success:
+                 print(f"✅ Survey and final message successfully sent to {phone_number}.")
+            else:
+                 print(f"⚠️ Survey polls sent, but failed to send final message to {phone_number}.")
+        # -----------------------------
+
+        # --- Add the main delay between users ---
+        if i < len(phone_numbers) - 1: # Don't wait after the last user
+            print(f"\n--- Waiting {DELAY_BETWEEN_USERS} seconds before processing next phone number... ---")
+            time.sleep(DELAY_BETWEEN_USERS)
+
+    print("\n" + "="*50)
+    print("🎉🎉🎉 ALL USERS PROCESSED! BROADCAST COMPLETE! 🎉🎉🎉")
