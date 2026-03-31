@@ -39,4 +39,4 @@ temp/
 # Bot specific
 config.json
 credentials.json
-token.json
+token.json.venv/

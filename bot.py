@@ -300,7 +300,7 @@ Thank you."""
         # 3. Send the final "Done" message if all polls were sent
         if success_for_this_user:
             print("--- Sending Final Message ---")
-            time.sleep(2) # Short delay after last poll
+            time.sleep(10) # Short delay after last poll
             final_success, result = api_tester.send_message(phone_number, final_message) # Changed variable name
             if final_success:
                  print(f"✅ Survey and final message successfully sent to {phone_number}.")
